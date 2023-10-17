@@ -12,6 +12,7 @@ this.canvas.height = 570;
 let playerVelocity_y = 0;
 let player1Score = 0;
 let player2Score = 0;
+let gameIsOver = false;
 
 
 img.src = './img/tennis.jpg'; 
@@ -76,12 +77,29 @@ function update() {
             }
         }
 
-        if(ball.x < 0) {
-            player2Score++;
-            resetGame(1);
-        } else if(ball.x + ball.width > this.canvas.width) {
-            player1Score++;
-            resetGame(-1);
+
+        if (!gameIsOver) {
+            if (ball.x < 0) {
+                player2Score++;
+                playScoreSound();
+                if (player2Score >= 10) {
+                    gameIsOver = true;
+                }
+                resetGame(1);
+            } else if (ball.x + ball.width > this.canvas.width) {
+                player1Score++;
+                playScoreSound();
+                if (player1Score >= 10) {
+                    gameIsOver = true;
+                }
+                resetGame(-1);
+            }
+        }
+
+        if (player1Score >= 5 || player2Score >= 5) {
+            gameIsOver = true;
+            displayGameOver();
+            return;
         }
 
         //scoreboard
@@ -94,19 +112,17 @@ function movePlayer(event) {
 
     //player1 moves
     if(event.code === "KeyW") {
-        player1.velocityY = -3;
+        player1.velocityY = -5;
     } else if(event.code === "KeyS") {
-            player1.velocityY = 3;
+            player1.velocityY = 5;
     }
-
-    //player2 moves
-/*     if(event.code === "ArrowUp") {
-        player2.velocityY = -3;
-    } else if(event.code === "ArrowDown") {
-            player2.velocityY = 3;
-    } */
 }
 
+document.addEventListener("keyup", function (event) {
+    if (gameIsOver && event.code === "KeyY") {
+        initializeGame();
+    }
+});
 
 function outOfBounds(yPosition) {
     return (yPosition < 0 || yPosition + player_height > this.canvas.height);
@@ -142,8 +158,8 @@ let ball = {
     y: this.canvas.height / 2,
     width: ballWidth,
     height: ballHeight,
-    velocityX: 1,
-    velocityY: 2
+    velocityX: 3,
+    velocityY: 4
 
 };
 
@@ -159,7 +175,40 @@ function resetGame(direction){
         width: ballWidth,
         height: ballHeight,
         velocityX: direction,
-        velocityY: 2
+        velocityY: 4
     
     }
+}
+
+function playScoreSound() {
+    const scoreSound = document.getElementById('scoreSound');
+    scoreSound.play();
+}
+
+function displayGameOver() {
+    context.font = "60px sans-serif";
+    context.fillStyle = "red";
+    context.fillText(`Game Over.`, canvas.width / 2 - 150, canvas.height / 2 - 30);
+    context.font = "30px sans-serif";
+    context.fillStyle = "red";
+    context.fillText("Press y to start again.", canvas.width / 2 - 150, canvas.height / 2 + 20);
+   
+}
+
+function initializeGame() {
+    player1Score = 0;
+    player2Score = 0;
+    gameIsOver = false;
+
+    // Reset player and ball positions, velocities, etc.
+    player1.y = canvas.height / 2;
+    player2.y = canvas.height / 2;
+    ball = {
+        x: canvas.width / 2,
+        y: canvas.height / 2,
+        width: ballWidth,
+        height: ballHeight,
+        velocityX: 1,
+        velocityY: 2
+    };
 }
