@@ -70,10 +70,12 @@ function update() {
         if(detecCollision(ball, player1)) {
             if(ball.x <= player1.x + player1.width) {
                 ball.velocityX *= -1;
+                playHitSound();
             }
         } else if(detecCollision(ball, player2)) {
             if(ball.x + ball.width >= player2.x) {
                 ball.velocityX *= -1;
+                playHitSound();
             }
         }
 
@@ -183,6 +185,11 @@ function resetGame(direction){
 function playScoreSound() {
     const scoreSound = document.getElementById('scoreSound');
     scoreSound.play();
+}
+
+function playHitSound() {
+    const hitSound = document.getElementById('hitSound');
+    hitSound.play();
 }
 
 function displayGameOver() {
